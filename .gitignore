@@ -8,11 +8,27 @@
 *.Rcheck/
 *.tar.gz
 
-# R Markdown临时文件
+# R环境文件
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# R包构建文件
+*.Rcheck/
+*.tar.gz
+
+# R Markdown临时文件和缓存
 *_cache/
 /cache/
 *_files/
 /figure-*
+
+# R Markdown生成的报告文件
+*.html
+*.nb.html
+*.pdf
+*.docx
 
 # 临时文件和日志
 *.log
@@ -34,12 +50,6 @@ Thumbs.db
 # *.csv
 # *.xlsx
 # *.xls
-
-# 生成的文档和报告
-*.pdf
-*.docx
-*.html
-*.nb.html
 
 # 包依赖
 packrat/
