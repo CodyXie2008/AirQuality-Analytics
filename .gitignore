@@ -1,0 +1,59 @@
+# R环境文件
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# R包构建文件
+*.Rcheck/
+*.tar.gz
+
+# R Markdown临时文件
+*_cache/
+/cache/
+*_files/
+/figure-*
+
+# 临时文件和日志
+*.log
+*.tmp
+*.swp
+*.swo
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# IDE和编辑器文件
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# 数据集文件（根据项目需求选择是否忽略）
+# *.csv
+# *.xlsx
+# *.xls
+
+# 生成的文档和报告
+*.pdf
+*.docx
+*.html
+*.nb.html
+
+# 包依赖
+packrat/
+renv/
+
+# 压缩文件
+*.zip
+*.rar
+*.7z
+
+# 备份文件
+*.bak
+*.backup
+
+# 大型数据文件（如果数据集很大）
+# large_dataset.csv
+# large_data_file.xlsx

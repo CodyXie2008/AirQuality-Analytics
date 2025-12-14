@@ -16,7 +16,7 @@ AirQuality-Analytics在原有教学项目的基础上，进一步深化了空气
 ## 项目结构
 
 ```
-Winter2025-DAMS/
+AirQuality-Analytics/
 ├── Class1-4/              # 课程资料和教学幻灯片
 ├── Datasets/              # 空气质量数据集
 │   ├── WHO_DB_FR_GER_cleaned_2024.csv  # 主要数据集（法国和德国空气质量）
