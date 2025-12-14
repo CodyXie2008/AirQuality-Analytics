@@ -46,6 +46,9 @@ Thumbs.db
 *.sublime-project
 *.sublime-workspace
 
+# 项目特定文件夹
+AP Statistics/
+
 # 数据集文件（根据项目需求选择是否忽略）
 # *.csv
 # *.xlsx
