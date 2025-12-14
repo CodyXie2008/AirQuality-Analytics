@@ -1,0 +1,112 @@
+---
+title: "Day 3 - Exploration"
+output: html_notebook
+---
+
+# 空气质量数据可视化分析 - 带注释版本
+
+## 1. 设置工作目录和检查文件
+```{r}
+# 列出当前工作目录中的所有文件，查看可用的数据文件
+dir()
+```
+
+## 2. 加载和探索数据
+```{r}
+# 读取空气质量数据文件
+join_df_full <- read.csv("join_df_full.csv")
+
+# 显示数据集的统计摘要，了解各变量的分布情况
+summary(join_df_full)
+```
+
+```{r}
+# 查看数据集的前几行，了解数据结构
+head(join_df_full)
+```
+
+## 3. 安装和加载可视化库
+```{r}
+# 安装ggplot2数据可视化包（如果尚未安装）
+install.packages('ggplot2')
+
+# 加载ggplot2库用于创建高级数据可视化
+library(ggplot2)
+```
+
+## 4. 区域分布条形图
+```{r}
+# 创建区域分布的条形图
+# ggplot(data) + geom_object(aes(data to plot); parameters) + options
+
+# 绘制各区域观测数量的条形图
+ggplot(join_df_full, aes(x = Region)) + 
+  # 使用条形图，统计每个区域的观测数量
+  geom_bar(stat = 'count', width = 0.5) + 
+  # 在条形上方添加数量标签
+  stat_count(aes(label = after_stat(count)), vjust = -0.5, geom = 'text') + 
+  # 设置y轴范围从0到25
+  ylim(0, 25)
+```
+
+## 5. SO2浓度直方图
+```{r}
+# 创建SO2（二氧化硫）浓度的直方图
+ggplot(join_df_full, aes(x = SO2)) + 
+  # 使用直方图显示SO2浓度的分布，分为10个区间
+  geom_histogram(bins = 10) + 
+  # 在每个区间上方添加观测数量标签
+  stat_bin(aes(label = after_stat(count)), bins = 10, vjust = -0.5, geom = 'text') + 
+  # 设置y轴范围从0到30
+  ylim(0, 30)
+```
+
+## 6. 区域PM10浓度点图
+```{r}
+# 创建区域与PM10浓度的点阵图
+ggplot(join_df_full) + 
+  # 使用点阵图显示不同区域的PM10浓度分布
+  geom_dotplot(aes(x = Region, y = PM10), 
+               binaxis = 'y',       # 在y轴方向进行分箱
+               stackdir = 'center', # 点在中心堆叠
+               stackratio = 1)      # 堆叠比例设为1
+```
+
+## 7. 区域PM10浓度箱线图
+```{r}
+# 创建区域与PM10浓度的箱线图
+ggplot(join_df_full) + 
+  # 使用箱线图比较不同区域的PM10浓度分布
+  geom_boxplot(aes(x = Region, y = PM10))
+  # 箱线图显示：中位数、四分位数、异常值等统计信息
+```
+
+## 8. PM10与PSI散点图
+```{r}
+# 创建PM10浓度与PSI指数的散点图
+ggplot(join_df_full) + 
+  # 使用散点图探索PM10和PSI之间的关系
+  geom_point(aes(x = PM10, y = PSI), 
+             color = 'blue')  # 设置点的颜色为蓝色
+  # 散点图用于探索两个连续变量之间的相关性
+```
+
+# 代码功能总结
+
+## 数据探索流程
+1. **数据加载**：读取CSV文件并了解数据结构
+2. **数据摘要**：使用summary()和head()函数初步探索数据
+3. **可视化分析**：使用ggplot2创建多种图表类型
+
+## 可视化类型说明
+- **条形图**：显示分类变量的频率分布
+- **直方图**：显示连续变量的分布情况
+- **点阵图**：显示分类变量与连续变量的关系，类似箱线图但显示所有数据点
+- **箱线图**：显示数据的五数概括（最小值、第一四分位数、中位数、第三四分位数、最大值）
+- **散点图**：探索两个连续变量之间的相关性
+
+## 空气质量指标解释
+- **Region**：区域分类变量
+- **SO2**：二氧化硫浓度（空气污染物）
+- **PM10**：可吸入颗粒物浓度（空气污染物）
+- **PSI**：污染物标准指数（综合空气质量指标）

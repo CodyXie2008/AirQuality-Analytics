@@ -1,0 +1,135 @@
+---
+title: "R Notebook - 空气质量描述性统计分析"
+output: html_notebook
+---
+
+# 空气质量数据描述性统计分析
+
+## 1. 环境设置和数据准备
+
+```{r}
+# 查看当前工作目录中的文件列表
+# 确认数据文件是否存在
+# 输出：显示当前目录下的所有文件和文件夹
+dir()
+```
+
+```{r}
+# 读取空气质量数据文件
+# join_df_full.csv 包含多种空气质量指标数据
+join_df_full <- read.csv("join_df_full.csv")
+
+# 查看数据的前6行，了解数据结构
+# 显示变量名、数据类型和示例值
+head(join_df_full)
+```
+
+## 2. 数据概览和基本统计
+
+```{r}
+# 生成数据框的全面统计摘要
+# 对于数值变量：显示最小值、Q1、中位数、均值、Q3、最大值
+# 对于分类变量：显示频数统计
+summary(join_df_full)
+```
+
+## 3. 集中趋势度量 - 以SO2（二氧化硫）为例
+
+```{r}
+# 计算SO2浓度的算术平均值
+# 均值对异常值敏感，受极端值影响较大
+mean(join_df_full$SO2)
+```
+
+```{r}
+# 计算SO2浓度的中位数（50%分位数）
+# 中位数对异常值不敏感，更能代表数据的中心位置
+median(join_df_full$SO2)
+```
+
+```{r}
+# 尝试计算SO2浓度的几何平均数（方法1）
+# 公式：几何平均数 = (所有值的乘积)^(1/观测值数量)
+# 问题：对于大数据集，这种方法可能导致数值溢出
+(prod(join_df_full$SO2)) ** (1 / length(join_df_full$SO2))
+```
+
+```{r}
+# 注释说明前一种方法的局限性
+# 安装并加载dplyr包用于数据处理
+# the above won't work for large datasets, with many rows
+# the following is an alternative 
+install.packages('dplyr')
+library(dplyr)
+```
+
+```{r}
+# 使用改进的方法计算几何平均数（方法2）
+# 步骤：取对数 → 计算均值 → 取指数 → 四舍五入
+# 公式：几何平均数 = exp(mean(log(x)))
+# 这种方法数值稳定，适用于大数据集
+join_df_full$SO2 %>% log() %>% mean() %>% exp() %>% round(1)
+```
+
+```{r}
+# 安装并加载modeest包，专门用于计算众数
+install.packages('modeest')
+library(modeest)
+```
+
+```{r}
+# 计算SO2浓度的众数（最频繁出现的值）
+# mfv = most frequent value
+# 对于连续型数据，众数可能不明显或不存在
+mfv(join_df_full$SO2)
+```
+
+## 4. 离散程度度量 - 以PSI（污染物标准指数）为例
+
+```{r}
+# 计算PSI值的范围（最小值和最大值）
+# 输出：包含最小值和最大值的向量
+range(join_df_full$PSI)
+```
+
+```{r}
+# 手动计算PSI值的极差（最大值 - 最小值）
+# 极差是最简单的离散程度度量，但受异常值影响大
+max(join_df_full$PSI) - min(join_df_full$PSI)
+```
+
+```{r}
+# 计算PSI值的四分位数
+# probs参数指定要计算的分位数
+# 这里计算第25百分位数（Q1）和第75百分位数（Q3）
+# 四分位距（IQR） = Q3 - Q1，用于识别异常值
+quantile(join_df_full$PSI, probs = c(0.25, 0.75))
+```
+
+```{r}
+# 计算PSI值的样本方差
+# 公式：方差 = Σ(xᵢ - x̄)² / (n-1)
+# 方差衡量数据点与均值的平均平方距离
+# 单位是原始单位的平方
+var(join_df_full$PSI)
+```
+
+```{r}
+# 通过对方差取平方根来计算标准差
+# 标准差 = 方差的平方根
+# 单位与原始数据相同，更易于解释
+sqrt(var(join_df_full$PSI))
+```
+
+```{r}
+# 直接使用内置函数计算标准差
+# 结果与 sqrt(var(join_df_full$PSI)) 完全相同
+# 标准差是描述数据离散程度最常用的统计量
+sd(join_df_full$PSI)
+```
+
+```{r}
+# 空代码块，可用于添加额外的分析或可视化
+# 例如：创建直方图、箱线图等可视化图表
+
+```
