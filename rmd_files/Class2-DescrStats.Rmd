@@ -1,0 +1,64 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+dir()
+```
+```{r}
+join_df_full <- read.csv("join_df_full.csv")
+head(join_df_full)
+```
+
+```{r}
+summary(join_df_full)
+```
+```{r}
+mean(join_df_full$SO2)
+```
+```{r}
+median(join_df_full$SO2)
+```
+```{r}
+(prod(join_df_full$SO2)) ** (1 / length(join_df_full$SO2))
+```
+```{r}
+# the above won't work for large datasets, with many rows
+# the following is an alternative 
+install.packages('dplyr')
+library(dplyr)
+```
+```{r}
+join_df_full$SO2 %>% log() %>% mean() %>% exp() %>% round(1)
+```
+```{r}
+install.packages('modeest')
+library(modeest)
+```
+
+```{r}
+mfv(join_df_full$SO2)
+```
+```{r}
+range(join_df_full$PSI)
+```
+```{r}
+max(join_df_full$PSI) - min(join_df_full$PSI)
+```
+```{r}
+quantile(join_df_full$PSI, probs = c(0.25, 0.75))
+```
+```{r}
+var(join_df_full$PSI)
+```
+```{r}
+sqrt(var(join_df_full$PSI))
+```
+```{r}
+sd(join_df_full$PSI)
+```
+```{r}
+
+```
+

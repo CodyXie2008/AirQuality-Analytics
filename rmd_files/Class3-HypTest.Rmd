@@ -1,0 +1,58 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+dir()
+```
+```{r}
+students_weights_pop <- read.csv("all_students_weights.csv")
+students_weights_pop
+```
+
+```{r}
+install.packages('dplyr')
+library(dplyr)
+```
+```{r}
+students_weights_sample <- sample_n(students_weights_pop, 30)
+students_weights_sample
+```
+
+```{r}
+t.test(students_weights_sample$student_weight, alternative = 'greater', mu = 60)
+```
+
+```{r}
+mean(students_weights_pop$student_weight)
+```
+
+```{r}
+head(join_df_full)
+```
+
+```{r}
+join_df_full_north <- join_df_full[(join_df_full$Region == 'N'),]
+join_df_full_north
+```
+
+```{r}
+join_df_full_west <- join_df_full[(join_df_full$Region == 'W'),]
+join_df_full_west
+```
+
+```{r}
+t.test(join_df_full_west$PSI, join_df_full_north$PSI, alternative = 'two.sided')
+```
+
+
+
+
+
+
+
+
+
+
+

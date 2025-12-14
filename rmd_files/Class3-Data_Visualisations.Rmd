@@ -1,0 +1,49 @@
+---
+title: "Day 3 - Exploration"
+output: html_notebook
+---
+
+```{r}
+dir()
+```
+```{r}
+join_df_full <- read.csv("join_df_full.csv")
+summary(join_df_full)
+```
+```{r}
+head(join_df_full)
+```
+
+
+```{r}
+install.packages('ggplot2')
+library(ggplot2)
+```
+
+
+```{r}
+# ggplot(data) + geom_object(aes(data to plot); parameters) + options
+ggplot(join_df_full, aes(x = Region)) + geom_bar(stat = 'count', width = 0.5) + stat_count(aes(label = after_stat(count)), vjust = -0.5, geom = 'text') + ylim(0, 25)
+```
+```{r}
+ggplot(join_df_full, aes(x = SO2)) + geom_histogram(bins = 10) + stat_bin(aes(label = after_stat(count)), bins = 10, vjust = -0.5, geom = 'text') + ylim(0, 30)
+```
+
+```{r}
+ggplot(join_df_full) + geom_dotplot(aes(x = Region, y = PM10), binaxis = 'y', stackdir = 'center', stackratio = 1)
+```
+```{r}
+ggplot(join_df_full) + geom_boxplot(aes(x = Region, y = PM10))
+```
+```{r}
+ggplot(join_df_full) + geom_point(aes(x = PM10, y = PSI), color = 'blue')
+```
+
+
+
+
+
+
+
+
+

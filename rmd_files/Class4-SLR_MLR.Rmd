@@ -1,0 +1,117 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+dir()
+```
+
+```{r}
+resales_df <- read.csv("resale-sample-small.csv")
+resales_df
+```
+```{r}
+library(ggplot2)
+
+ggplot(resales_df, aes(x = floor_area_sqm, y = resale_price)) + geom_point(color = 'blue')
+```
+```{r}
+fit.lm <- lm(resale_price ~ floor_area_sqm, resales_df)
+coef(fit.lm)
+```
+```{r}
+resale_prediction <- data.frame(floor_area_sqm = c(74, 69, 102))
+resale_prediction
+```
+
+```{r}
+resale_prediction$prediction <- predict(fit.lm, resale_prediction)
+resale_prediction
+```
+
+```{r}
+ggplot(resales_df, aes(x = floor_area_sqm, y = resale_price)) + geom_point(color = 'blue') + geom_smooth(se = FALSE, method = lm, color = 'red')
+```
+```{r}
+summary(fit.lm)
+```
+
+```{r}
+resales_df$residuals <- residuals(fit.lm)
+resales_df
+```
+```{r}
+resales_df$fitted <- fitted(fit.lm)
+resales_df
+```
+
+```{r}
+install.packages('zoo')
+library(zoo)
+```
+
+```{r}
+resales_df$actual_month <- as.yearmon(resales_df$month)
+resales_df
+```
+```{r}
+qqnorm(resales_df$residuals)
+qqline(resales_df$residuals, col = 'steelblue', lwd = 2)
+```
+
+```{r}
+plot(x = resales_df$fitted, y = resales_df$residuals)
+```
+```{r}
+plot(x = resales_df$floor_area_sqm, y = resales_df$residuals)
+```
+
+```{r}
+plot(x = resales_df$actual_month, y = resales_df$residuals)
+```
+```{r}
+cor(x = resales_df$floor_area_sqm, y = resales_df$resale_price)
+```
+```{r}
+resales_df$year_of_sale <- as.numeric(substr(resales_df$month, 1, 4))
+head(resales_df)
+```
+
+```{r}
+resales_df$remaining_lease <- 99- (resales_df$year_of_sale - resales_df$lease_commence_date)
+resales_df
+```
+```{r}
+mlr.fit <- lm(resale_price ~ floor_area_sqm + remaining_lease, data = resales_df)
+coef(mlr.fit)
+```
+```{r}
+resale_predictions <- data.frame(floor_area_sqm = c(74, 69, 102), 
+                                 remaining_lease = c(65, 73, 84))
+
+resale_predictions$predictions <- predict(mlr.fit, resale_predictions)
+resale_predictions
+```
+
+```{r}
+summary(mlr.fit)
+```
+
+```{r}
+install.packages('car')
+library(car)
+```
+
+```{r}
+vif(mlr.fit)
+```
+```{r}
+mlr.fit2 <- lm(resale_price ~ floor_area_sqm + remaining_lease + 
+                 lease_commence_date, data = resales_df)
+vif(mlr.fit2)
+```
+
+
+
+
