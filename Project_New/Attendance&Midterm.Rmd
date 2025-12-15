@@ -1,0 +1,130 @@
+---
+title: "Attendance and Midterm Score Relationship Analysis"
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r}
+dir()
+```
+LOADING IN THE DATASET
+
+```{r}
+# load in the dataset
+project <- read.csv("Attendance&Midterm.csv")
+head(project)
+```
+```{r}
+# exploring, getting mean and median
+summary(project)
+```
+
+DESCR STATS
+
+```{r}
+quantile(project$Attendance, probs = c(0.25, 0.75))
+```
+```{r}
+sd(project$Midterm)
+```
+VISUALISATION METHODS
+
+```{r}
+# 检查并安装ggplot2包（如果未安装）
+if (!require(ggplot2)) {
+  install.packages('ggplot2')
+  library(ggplot2)
+}
+```
+
+```{r}
+# bar chart for year; year is integer currently, we can change to categorical (factor)
+ggplot(project, aes(x = Midterm)) + geom_bar(stat = 'count', width = 0.5) + stat_count(aes(label = after_stat(count)), vjust = -0.5, geom = 'text') + ylim(0, 15)
+```
+```{r}
+# histogram for Attendance distribution
+ggplot(project, aes(x = Attendance)) + geom_histogram(bins = 25) + stat_bin(aes(label = after_stat(count)), bins = 25, vjust = -0.5, geom = 'text') + ylim(0, 50)
+```
+
+```{r}
+# boxplot for how Midterm distribution varies with Attendance
+ggplot(project) + geom_boxplot(aes(x = Attendance, y = Midterm))
+```
+```{r}
+# boxplot for how Midterm distribution varies with Attendance (grouped by attendance ranges)
+project$Attendance_Group <- cut(project$Attendance, breaks = seq(0, 100, by = 10))
+ggplot(project) + geom_boxplot(aes(x = Attendance_Group, y = Midterm)) +
+  labs(x = "Attendance Range", y = "Midterm Score")
+```
+
+```{r}
+# scatterplot 
+ggplot(project) + geom_point(aes(x = Attendance, y = Midterm), color = 'blue')
+```
+```{r}
+# use Order as a way to differentiate the points
+ggplot(project) + geom_point(aes(x = Attendance, y = Midterm, color = Order))
+```
+MODELING
+
+```{r}
+# linear regression model for Midterm vs Attendance
+project_lm <- lm(Midterm ~ Attendance, project)
+coefficients <- coef(project_lm)
+names(coefficients) <- c("intercept", "slope")
+coefficients
+```
+
+
+```{r}
+# visualising our model with correlation coefficient
+correlation <- cor(project$Attendance, project$Midterm)
+ggplot(project, aes(x = Attendance, y = Midterm)) + 
+  geom_point(color = 'blue') + 
+  geom_smooth(se = TRUE, method = lm, color = 'red') +
+  annotate("text", x = min(project$Attendance), y = max(project$Midterm), 
+           label = paste("Correlation:", round(correlation, 3)), 
+           hjust = 0, vjust = 1, color = "darkgreen", size = 5)
+```
+```{r}
+# doing the hypothesis test for our model 
+summary(project_lm)
+```
+```{r}
+# compute residuals and fitted values 
+project$residuals <- residuals(project_lm)
+project$fitted <- fitted(project_lm)
+head(project)
+```
+# RELATIONSHIP ANALYSIS
+
+```{r}
+# correlation between Attendance and Midterm
+correlation <- cor(project$Attendance, project$Midterm)
+cat("Pearson Correlation Coefficient:", round(correlation, 3), "\n")
+```
+
+```{r}
+# correlation significance test
+cor_test <- cor.test(project$Attendance, project$Midterm)
+print(cor_test)
+```
+```{r}
+Midterm_prediction <- data.frame(Attendance = c(40, 50, 60))
+Midterm_prediction
+```
+
+```{r}
+# using our model for predictions
+Midterm_prediction$prediction <- predict(project_lm, Midterm_prediction)
+Midterm_prediction
+```
+
+
+
+
+
