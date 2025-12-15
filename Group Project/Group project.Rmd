@@ -1,0 +1,65 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+```{r}
+dir()
+```
+
+```{r}
+library(ggplot2)
+install.packages('readxl')
+library(readxl)
+```
+```{r}
+# 读取Excel数据文件
+France_extra <- read_excel("France_extra.xlsx")
+Germany_extra <- read_excel("Germany_extra.xlsx")
+
+# 读取CSV数据文件
+WHO_DB_FR_GER_cleaned_2024 <- read.csv("../Datasets/WHO_DB_FR_GER_cleaned_2024.csv")
+
+# 从WHO数据中筛选法国和德国的数据
+France <- WHO_DB_FR_GER_cleaned_2024[WHO_DB_FR_GER_cleaned_2024$country_name == "France", ]
+Germany <- WHO_DB_FR_GER_cleaned_2024[WHO_DB_FR_GER_cleaned_2024$country_name == "Germany", ]
+
+# 查看数据结构
+# str(France_extra)
+# str(Germany_extra)
+# str(WHO_DB_FR_GER_cleaned_2024)
+# str(France)
+# str(Germany)
+```
+```{r}
+plot(France_extra)
+plot(Germany_extra)
+summary(France_extra)
+summary(Germany_extra)
+```
+```{r}
+var(France_extra)
+var(Germany_extra)
+```
+```{r}
+ggplot(France_extra, aes(x = pm10_concentration)) + geom_histogram(bins = 10) + stat_bin(aes(label = after_stat(count)), bins = 10, vjust = -0.5, geom = 'text') + ylim(0, 500)
+ggplot(France_extra, aes(x = pm25_concentration)) + geom_histogram(bins = 10) + stat_bin(aes(label = after_stat(count)), bins = 10, vjust = -0.5, geom = 'text') + ylim(0, 500)
+ggplot(Germany_extra, aes(x = pm10_concentration)) + geom_histogram(bins = 10) + stat_bin(aes(label = after_stat(count)), bins = 10, vjust = -0.5, geom = 'text') + ylim(0, 500)
+ggplot(Germany_extra, aes(x = pm25_concentration)) + geom_histogram(bins = 10) + stat_bin(aes(label = after_stat(count)), bins = 10, vjust = -0.5, geom = 'text') + ylim(0, 500)
+```
+```{r}
+ggplot(France_extra) + geom_boxplot(aes(x = pm10_concentration))
+ggplot(France_extra) + geom_boxplot(aes(x = pm25_concentration))
+ggplot(Germany_extra) + geom_boxplot(aes(x = pm10_concentration))
+ggplot(Germany_extra) + geom_boxplot(aes(x = pm25_concentration))
+```
+```{r}
+ggplot(WHO_DB_FR_GER_cleaned_2024) + geom_point(aes(x = year, y = pm10_concentration), color = 'black')
+ggplot(WHO_DB_FR_GER_cleaned_2024) + geom_point(aes(x = year, y = pm25_concentration), color = 'black')
+ggplot(France) + geom_point(aes(x = year, y = pm25_concentration), color = 'black')
+ggplot(Germany) + geom_point(aes(x = year, y = pm25_concentration), color = 'black')
+```

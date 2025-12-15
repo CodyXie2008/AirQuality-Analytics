@@ -1,0 +1,216 @@
+---
+title: "Project code"
+output:
+  word_document: default
+  html_notebook: default
+  pdf_document: default
+---
+
+```{r}
+dir()
+```
+LOADING IN THE DATASET
+
+```{r}
+# load in the dataset
+project <- read.csv("air_quality_cleaned_pm.csv")
+head(project)
+```
+```{r}
+# exploring, getting mean and median
+summary(project)
+```
+```{r}
+# if we just want the dataset for one country
+# filtering for Germany
+germany_df <- project[(project$country_name == "Germany"),]
+summary(germany_df)
+```
+```{r}
+# filtering for France
+france_df <- project[(project$country_name == 'France'),]
+summary(france_df)
+```
+```{r}
+# filtering for China
+china_df <- project[(project$country_name == 'China'),]
+summary(china_df)
+```
+
+DESCR STATS
+
+```{r}
+# overall mean for entire dataset for PM2.5; substitute with germany_df 
+# or france_df for country-specific mean
+mean(project$pm25_concentration)
+```
+```{r}
+# or france_df for country-specific mean
+mean(france_df$pm25_concentration)
+```
+```{r}
+# or france_df for country-specific min
+min(france_df$pm25_concentration)
+```
+```{r}
+# overall median PM10
+median(project$pm10_concentration)
+```
+
+
+```{r}
+# 检查并安装dplyr包（如果未安装）
+if (!require(dplyr)) {
+  install.packages('dplyr')
+  library(dplyr)
+}
+project$pm25_concentration %>% log() %>% mean() %>% exp %>% round(1)
+```
+```{r}
+range(project$pm25_concentration)
+```
+```{r}
+max(project$pm25_concentration) - min(project$pm25_concentration)
+```
+```{r}
+quantile(project$pm25_concentration, probs = c(0.25, 0.75))
+```
+```{r}
+# compute the IQR
+quantile(project$pm25_concentration, probs = 0.75) - quantile(project$pm25_concentration, probs = 0.25)
+```
+```{r}
+var(project$pm25_concentration)
+```
+```{r}
+sd(project$pm25_concentration)
+```
+VISUALISATION METHODS
+
+```{r}
+# 检查并安装ggplot2包（如果未安装）
+if (!require(ggplot2)) {
+  install.packages('ggplot2')
+  library(ggplot2)
+}
+```
+
+```{r}
+# bar chart for year; year is integer currently, we can change to categorical (factor)
+ggplot(project, aes(x = factor(year))) + geom_bar(stat = 'count', width = 0.5) + stat_count(aes(label = after_stat(count)), vjust = -0.5, geom = 'text') + ylim(0, 2000)
+```
+```{r}
+# histogram for PM2.5 across both countries
+ggplot(project, aes(x = pm25_concentration)) + geom_histogram(bins = 25) + stat_bin(aes(label = after_stat(count)), bins = 25, vjust = -0.5, geom = 'text') + ylim(0, 9000)
+```
+```{r}
+# dotplot for how PM10 is distributed across different years
+# make sure you convert year to a factor
+ggplot(project) + geom_dotplot(aes(x = factor(year), y = pm10_concentration), binaxis = 'y', stackdir = 'center', stackratio = 0)
+```
+
+```{r}
+# boxplot for how PM10 distribution varies between the two countries
+ggplot(project) + geom_boxplot(aes(x = country_name, y = pm10_concentration))
+```
+```{r}
+# scatterplot 
+ggplot(project) + geom_point(aes(x = pm10_concentration, y = pm25_concentration), color = 'blue')
+```
+```{r}
+# also use country as a way to differentiate the points
+ggplot(project) + geom_point(aes(x = pm10_concentration, y = pm25_concentration, color = country_name))
+```
+MAKING USE OF OUR SAMPLE 
+
+```{r}
+# two sample t test for our project
+# let's say we hypothesise that AQ in Germany is worse than 
+# France. Is this true? 
+t.test(germany_df$pm25_concentration, france_df$pm25_concentration, alternative = 'greater')
+
+```
+MODELING
+
+```{r}
+# change the data source to germany_df or france_df for
+# country-specific model 
+project_lm <- lm(pm25_concentration ~ pm10_concentration, project)
+coef(project_lm)
+```
+```{r}
+pm25_prediction <- data.frame(pm10_concentration = c(40, 50, 60))
+pm25_prediction
+```
+
+```{r}
+# using our model for predictions
+pm25_prediction$prediction <- predict(project_lm, pm25_prediction)
+pm25_prediction
+```
+
+```{r}
+# visualising our model 
+ggplot(project, aes(x = pm10_concentration, y = pm25_concentration)) + geom_point(color = 'blue') + geom_smooth(se = TRUE, method = lm, color = 'red')
+```
+```{r}
+# doing the hypothesis test for our model 
+summary(project_lm)
+```
+```{r}
+# compute residuals and fitted values 
+project$residuals <- residuals(project_lm)
+project$fitted <- fitted(project_lm)
+head(project)
+```
+
+```{r}
+# plot the normal probabiity plot
+qqnorm(project$residuals)
+qqline(project$residuals, col = 'steelblue', lwd = 2)
+```
+```{r}
+# e vs y^
+plot(x = project$fitted, y = project$residuals)
+```
+
+```{r}
+# e vs x
+plot(x = project$pm10_concentration, y = project$residuals)
+```
+```{r}
+# e vs time
+plot(x = project$year, y = project$residuals)
+```
+MULTIPLE LINEAR REGRESSION
+
+```{r}
+# adding NO2 concentration as an additional predictor 
+project_mlr <- lm(pm25_concentration ~ pm10_concentration + no2_concentration, data = project)
+coef(project_mlr)
+```
+```{r}
+# using our model for predictions
+mlr_predictions <- data.frame(pm10_concentration = c(40, 50, 60), 
+                              no2_concentration = c(60, 40, 30))
+
+mlr_predictions$predictions <- predict(project_mlr, mlr_predictions)
+mlr_predictions
+```
+
+```{r}
+# doing the hypothesis test
+summary(project_mlr)
+```
+```{r}
+# 检查并安装car包（如果未安装）
+if (!require(car)) {
+  install.packages('car')
+  library(car)
+}
+```
+
+```{r}
+vif(project_mlr)
+```
+

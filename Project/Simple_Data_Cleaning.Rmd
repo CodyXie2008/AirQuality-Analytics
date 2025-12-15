@@ -1,0 +1,103 @@
+---
+title: "PM数据清洗"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# 检查并安装必要的包（如果未安装）
+required_packages <- c("dplyr", "ggplot2")
+
+for (pkg in required_packages) {
+  if (!require(pkg, character.only = TRUE)) {
+    install.packages(pkg)
+    library(pkg, character.only = TRUE)
+  }
+}
+```
+
+# PM2.5和PM10数据清洗
+
+## 1. 加载数据
+
+```{r load_data}
+# 读取原始数据
+project <- read.csv("air_quality_database.csv")
+
+# 查看原始数据信息
+cat("原始数据行数:", nrow(project), "\n")
+cat("原始数据列数:", ncol(project), "\n")
+cat("PM2.5缺失值数量:", sum(is.na(project$pm25_concentration)), "\n")
+cat("PM10缺失值数量:", sum(is.na(project$pm10_concentration)), "\n")
+```
+
+## 2. 数据清洗
+
+```{r clean_data}
+# 移除PM2.5和PM10列中的NA值
+cleaned_data <- project[!is.na(project$pm25_concentration) & !is.na(project$pm10_concentration), ]
+
+# 查看清洗后数据信息
+cat("清洗后数据行数:", nrow(cleaned_data), "\n")
+cat("移除的行数:", nrow(project) - nrow(cleaned_data), "\n")
+cat("PM2.5缺失值数量:", sum(is.na(cleaned_data$pm25_concentration)), "\n")
+cat("PM10缺失值数量:", sum(is.na(cleaned_data$pm10_concentration)), "\n")
+```
+
+## 3. 保存清洗后的数据
+
+```{r save_data}
+# 保存清洗后的数据为CSV文件
+write.csv(cleaned_data, "air_quality_cleaned_pm.csv", row.names = FALSE)
+
+# 验证保存结果
+if (file.exists("air_quality_cleaned_pm.csv")) {
+  # 重新读取保存的文件进行验证
+  saved_data <- read.csv("air_quality_cleaned_pm.csv")
+  
+  cat("✅ 清洗后的数据已成功保存为CSV文件: air_quality_cleaned_pm.csv\n")
+  cat("📊 文件包含", nrow(saved_data), "行有效数据\n")
+  cat("📁 文件大小:", round(file.info("air_quality_cleaned_pm.csv")$size / 1024, 2), "KB\n")
+  cat("✅ 文件验证: PM2.5缺失值数量:", sum(is.na(saved_data$pm25_concentration)), "\n")
+  cat("✅ 文件验证: PM10缺失值数量:", sum(is.na(saved_data$pm10_concentration)), "\n")
+} else {
+  cat("❌ CSV文件保存失败!\n")
+}
+```
+
+```{r save_backup}
+# 可选：保存为备份文件（带时间戳）
+backup_filename <- paste0("air_quality_cleaned_pm_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".csv")
+write.csv(cleaned_data, backup_filename, row.names = FALSE)
+
+if (file.exists(backup_filename)) {
+  cat("📂 备份文件已保存:", backup_filename, "\n")
+}
+```
+
+## 4. 清洗结果统计
+
+```{r summary}
+# 基本统计信息
+cat("## 清洗结果统计\n")
+cat("PM2.5浓度范围:", range(cleaned_data$pm25_concentration), "\n")
+cat("PM2.5平均值:", mean(cleaned_data$pm25_concentration), "\n")
+cat("PM10浓度范围:", range(cleaned_data$pm10_concentration), "\n")
+cat("PM10平均值:", mean(cleaned_data$pm10_concentration), "\n")
+
+# 国家分布
+cat("\n包含国家数量:", length(unique(cleaned_data$country_name)), "\n")
+cat("数据年份范围:", range(cleaned_data$year), "\n")
+```
+
+## 5. 数据预览
+
+```{r preview}
+# 查看清洗后数据的前几行
+cat("## 清洗后数据预览\n")
+head(cleaned_data)
+```
+
+---
+
